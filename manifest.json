@@ -1,0 +1,46 @@
+{
+  "manifest_version": "2",
+  "api_version": "1",
+  "name": "File Search",
+  "description": "Quick Search files and directories from Ulauncher using fd",
+  "developer_name": "Bruno Paz",
+  "icon": "images/icon.png",
+  "options": {
+    "query_debounce": 0.5
+  },
+  "preferences": [
+    {
+      "id": "kw",
+      "type": "keyword",
+      "name": "fd - File and Directory Search",
+      "default_value": "fd"
+    },
+    {
+      "id": "ff_kw",
+      "type": "keyword",
+      "name": "ff - File Search",
+      "default_value": "ff"
+    },
+    {
+      "id": "fd_kw",
+      "type": "keyword",
+      "name": "fdir - Directory Search",
+      "default_value": "fdir"
+    },
+    {
+      "id": "terminal_emulator",
+      "type": "select",
+      "name": "Terminal Emulator",
+      "description": "Sets the terminal emulator to open directories directly in the terminal",
+      "default_value": "gnome-terminal",
+      "options": ["gnome-terminal", "tilix", "terminator", "xfce-terminal"]
+    },
+    {
+      "id": "base_dir",
+      "type": "input",
+      "name": "Base dir",
+      "description": "The base directory to start your searches. Ex: /",
+      "default_value": "/"
+    }
+  ]
+}
