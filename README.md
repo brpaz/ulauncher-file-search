@@ -7,7 +7,7 @@
 
 ## Demo
 
-TODO Add demo here.
+![demo](demo.gif)
 
 ## Requirements
 
