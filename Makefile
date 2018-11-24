@@ -1,5 +1,5 @@
 
-EXT_NAME:=ulauncher-fd
+EXT_NAME:=ulauncher-file-search
 EXT_DIR:=$(shell pwd)
 
 lint:

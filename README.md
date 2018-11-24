@@ -13,7 +13,7 @@ TODO Add demo here.
 
 - Ulauncher
 - Python >= 2.7
-- [fd](https://github.com/sharkdp/fd) - A simple, fast and user-friendly alternative to 'find'
+- [fd](https://github.com/sharkdp/fd) - A simple, fast and user-friendly alternative to 'find'.
 
 ## Install
 
