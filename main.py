@@ -105,11 +105,15 @@ class KeywordQueryEventListener(EventListener):
                 on_enter=DoNothingAction())])
 
         keyword = event.get_keyword()
+        # Find the keyword id using the keyword (since the keyword can be changed by users)
+        for kwId, kw in extension.preferences.iteritems():
+            if kw == keyword:
+                keywordId = kwId
 
         file_type = FILE_SEARCH_ALL
-        if keyword == "ff":
+        if keywordId == "ff_kw":
             file_type = FILE_SEARCH_FILE
-        elif keyword == "fdir":
+        elif keywordId == "fd_kw":
             file_type = FILE_SEARCH_DIRECTORY
 
         results = extension.search(query.strip(), file_type)
