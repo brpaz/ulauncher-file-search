@@ -3,7 +3,11 @@
 import logging
 import os
 import subprocess
+import mimetypes
+import gi
+gi.require_version('Gtk', '3.0')
 # pylint: disable=import-error
+from gi.repository import Gio, Gtk
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
 from ulauncher.api.shared.event import KeywordQueryEvent
@@ -60,15 +64,37 @@ class FileSearchExtension(Extension):
             return []
 
         files = out.split('\n'.encode())
-        files = [_f for _f in files if _f]  # remove empty lines
+        files = list([_f for _f in files if _f])  # remove empty lines
 
         result = []
+        #get folder icon outside loop, so it only happens once
+        file = Gio.File.new_for_path("/")
+        folder_info = file.query_info('standard::icon', 0, Gio.Cancellable())
+        folder_icon = folder_info.get_icon().get_names()[0]
+        icon_theme = Gtk.IconTheme.get_default()
+        icon_folder = icon_theme.lookup_icon(folder_icon, 128, 0)
+        if icon_folder:
+            folder_icon = icon_folder.get_filename()
+        else:
+            folder_icon = "images/folder.png"
 
         # pylint: disable=C0103
-        for f in files:
-            icon = 'images/file.png'
+        for f in files[:15]:
+            filename = os.path.splitext(f)
             if os.path.isdir(f):
-                icon = 'images/folder.png'
+                icon = folder_icon
+            else:
+                type_, encoding = mimetypes.guess_type(f.decode('utf-8'))
+
+                if type_:
+                    file_icon = Gio.content_type_get_icon(type_)
+                    file_info = icon_theme.choose_icon(file_icon.get_names(), 128, 0)
+                    if file_info:
+                        icon = file_info.get_filename()
+                    else:
+                        icon = "images/file.png"
+                else:
+                    icon = "images/file.png"
 
             result.append({'path': f, 'name': f, 'icon': icon})
 
@@ -108,7 +134,7 @@ class KeywordQueryEventListener(EventListener):
 
         keyword = event.get_keyword()
         # Find the keyword id using the keyword (since the keyword can be changed by users)
-        for kw_id, kw in extension.preferences.items():
+        for kw_id, kw in list(extension.preferences.items()):
             if kw == keyword:
                 keyword_id = kw_id
 
