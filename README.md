@@ -1,7 +1,7 @@
 # ulauncher-file-search
 
-[![Build Status](https://img.shields.io/travis/com/brpaz/ulauncher-file-search.svg)](https://github.com/brpaz/ulauncher-file-search)
-[![GitHub license](https://img.shields.io/github/license/brpaz/ulauncher-fd.svg)](https://github.com/brpaz/:ulauncher-file-search/blob/master/LICENSE)
+[![Ulauncher Extension](https://img.shields.io/badge/Ulauncher-Extension-green.svg?style=for-the-badge)](https://ext.ulauncher.io/-/github-brpaz-ulauncher-file-search)
+[![GitHub license](https://img.shields.io/github/license/brpaz/file-search.svg?style=for-the-badge)](https://github.com/brpaz/ulauncher-file-search/blob/master/LICENSE)
 
 > Quick Search files and directories from [Ulauncher](https://ulauncher.io) using [https://github.com/sharkdp/fd](fd).
 
@@ -11,8 +11,8 @@
 
 ## Requirements
 
-- Ulauncher
-- Python >= 2.7
+- Ulauncher 5+
+- Python 3+
 - [fd](https://github.com/sharkdp/fd) - A simple, fast and user-friendly alternative to 'find'.
 
 ## Install
@@ -42,30 +42,46 @@ To search, input one of the previous keywords to trigger the extension and start
 
 - **Terminal Emulator** -> Sets the terminal emulator to use when opening directories.
 - **Base dir** -> The base directory to start your searches. By detault, its the root folder "/" but you can set to your home directory, for example. Note, that only absolute paths are supported.
-
 ## Development
 
 ```
-git clone https://github.com/brpaz/ulauncher-fd
+git clone https://github.com/brpaz/ulauncher-file-search
 make link
 ```
 
 The `make link` command will symlink the cloned repo into the appropriate location on the ulauncher extensions folder.
 
-To see your changes, stop ulauncher and run it from the command line with: `ulauncher -v`.
+Make sure Ulauncher is not running and from command line run:
 
-## Todo
+```sh
+ulauncher --no-extensions --dev -v |& grep "file-search"
+```
 
-- An support for in file search using rigrep.
+This will start ulauncher with all the extensions disable which will make it easier to look for logs.
+
+You then have to start the Circle CI extension manually. In the output of the previous command you should find something similar to this:
+
+```sh
+VERBOSE=1 ULAUNCHER_WS_API=ws://127.0.0.1:5054/file-search PYTHONPATH=/usr/lib/python3/dist-packages /usr/bin/python3 /home/bruno/.cache/ulauncher_cache/extensions/file-search/main.py
+``` 
+
+Copy and run that command in another terminal window.
+
+Your extension should now be running. To see your changes, just Ctrl+C and re-run the last command.
 
 ## Contributing
 
-- Fork it!
-- Create your feature branch: git checkout -b my-new-feature
-- Commit your changes: git commit -am 'Add some feature'
-- Push to the branch: git push origin my-new-feature
-- Submit a pull request :D
+All contributions are welcome. Just open an issue and/or create a PR.
+
+If you like my work, feel free to "Buy me a Coffee".
+
+<a href="https://www.buymeacoffee.com/Z1Bu6asGV" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+
+## Links
+
+* [Ulauncher Extensions](https://ext.ulauncher.io/)
+* [Ulauncher 5.0 (Extension API v2.0.0) — Ulauncher 5.0.0 documentation](http://docs.ulauncher.io/en/latest/)
 
 ## License
 
-MIT &copy; [Bruno Paz]
+MIT &copy; [Bruno Paz](http://brunopaz.net)

@@ -34,7 +34,10 @@ class FileSearchExtension(Extension):
 
     def search(self, query, file_type=None):
         """ Searches for Files using fd command """
-        cmd = ['timeout', '5s', 'ionice', '-c', '3', 'fd', '--threads', '1', '--hidden']
+        cmd = [
+            'timeout', '5s', 'ionice', '-c', '3', 'fd', '--threads', '1',
+            '--hidden'
+        ]
 
         if file_type == FILE_SEARCH_FILE:
             cmd.append('-t')
@@ -56,24 +59,18 @@ class FileSearchExtension(Extension):
             self.logger.error(err)
             return []
 
-        files = out.split('\n')
-        files = filter(None, files)  # remove empty lines
+        files = out.split('\n'.encode())
+        files = [_f for _f in files if _f]  # remove empty lines
 
         result = []
 
         # pylint: disable=C0103
         for f in files:
-            filename, file_extension = os.path.splitext(f)
-            if file_extension:
-                icon = 'images/file.png'
-            else:
+            icon = 'images/file.png'
+            if os.path.isdir(f):
                 icon = 'images/folder.png'
 
-            result.append({
-                'path': f,
-                'name': filename,
-                'icon': icon
-            })
+            result.append({'path': f, 'name': f, 'icon': icon})
 
         return result
 
@@ -82,8 +79,11 @@ class FileSearchExtension(Extension):
         terminal_emulator = self.preferences['terminal_emulator']
 
         # some terminals might work differently. This is already prepared for that.
-        if terminal_emulator in ['gnome-terminal', 'terminator', 'tilix', 'xfce-terminal']:
-            return RunScriptAction(terminal_emulator, ['--working-directory', path])
+        if terminal_emulator in [
+                'gnome-terminal', 'terminator', 'tilix', 'xfce-terminal'
+        ]:
+            return RunScriptAction(terminal_emulator,
+                                   ['--working-directory', path])
 
         return DoNothingAction()
 
@@ -99,40 +99,44 @@ class KeywordQueryEventListener(EventListener):
         query = event.get_argument()
 
         if not query or len(query) < 3:
-            return RenderResultListAction([ExtensionResultItem(
-                icon='images/icon.png',
-                name='Keep typing your search criteria ...',
-                on_enter=DoNothingAction())])
+            return RenderResultListAction([
+                ExtensionResultItem(
+                    icon='images/icon.png',
+                    name='Keep typing your search criteria ...',
+                    on_enter=DoNothingAction())
+            ])
 
         keyword = event.get_keyword()
         # Find the keyword id using the keyword (since the keyword can be changed by users)
-        for kwId, kw in extension.preferences.iteritems():
+        for kw_id, kw in extension.preferences.items():
             if kw == keyword:
-                keywordId = kwId
+                keyword_id = kw_id
 
         file_type = FILE_SEARCH_ALL
-        if keywordId == "ff_kw":
+        if keyword_id == "ff_kw":
             file_type = FILE_SEARCH_FILE
-        elif keywordId == "fd_kw":
+        elif keyword_id == "fd_kw":
             file_type = FILE_SEARCH_DIRECTORY
 
         results = extension.search(query.strip(), file_type)
 
         if not results:
-            return RenderResultListAction([ExtensionResultItem(
-                icon='images/icon.png',
-                name='No Results found matching %s' % query,
-                on_enter=HideWindowAction())])
+            return RenderResultListAction([
+                ExtensionResultItem(icon='images/icon.png',
+                                    name='No Results found matching %s' %
+                                    query,
+                                    on_enter=HideWindowAction())
+            ])
 
         items = []
         for result in results[:15]:
-            items.append(ExtensionSmallResultItem(
-                icon=result['icon'],
-                name=result['path'],
-                on_enter=OpenAction(result['path']),
-                on_alt_enter=extension.get_open_in_terminal_script(
-                    result['path'])
-            ))
+            items.append(
+                ExtensionSmallResultItem(
+                    icon=result['icon'],
+                    name=result['path'].decode("utf-8"),
+                    on_enter=OpenAction(result['path'].decode("utf-8")),
+                    on_alt_enter=extension.get_open_in_terminal_script(
+                        result['path'].decode("utf-8"))))
 
         return RenderResultListAction(items)
 

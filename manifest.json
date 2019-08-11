@@ -1,6 +1,5 @@
 {
-  "manifest_version": "2",
-  "api_version": "1",
+  "required_api_version": "^2.0.0",
   "name": "File Search",
   "description": "Quick Search files and directories from Ulauncher using fd",
   "developer_name": "Bruno Paz",
