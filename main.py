@@ -42,7 +42,7 @@ class FileSearchExtension(Extension):
         fdcmd = 'fd'
 
         distro = platform.dist()[0];
-        if distro == 'debian' or distro = 'Ubuntu':
+        if distro == 'debian' or distro == 'Ubuntu':
           fdcmd = 'fdfind'
 
         cmd = [
