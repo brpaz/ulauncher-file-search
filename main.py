@@ -1,6 +1,6 @@
 """ Main Module """
 
-import json
+import functools
 import logging
 import os
 import subprocess
@@ -28,8 +28,18 @@ FILE_SEARCH_DIRECTORY = 'DIR'
 
 FILE_SEARCH_FILE = 'FILE'
 
-FILE_CACHE = 'ulauncher-file-search.json'
 
+def memoize(func):
+    cache = func.cache = {}
+
+    @functools.wraps(func)
+    def memoized_func(*args, **kwargs):
+        key = str(args) + str(kwargs)
+        if key not in cache:
+            cache[key] = func(*args, **kwargs)
+        return cache[key]
+
+    return memoized_func
 
 class FileSearchExtension(Extension):
     """ Main Extension Class  """
@@ -39,16 +49,12 @@ class FileSearchExtension(Extension):
         super(FileSearchExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
 
+    @memoize
     def search(self, query, file_type=None):
         """ Searches for Files using fd command """
 
-        try:
-            cache = json.load('/tmp/' + FILE_CACHE)
-        except (IOError, ValueError):
-            cache = {}
-
         cmd = [
-            'timeout', '5s', 'ionice', '-c', '3', 'fd', '--threads', '1',
+            'timeout', '5s', 'ionice', '-c', '3', 'fdfind', '--threads', '1',
             '--hidden'
         ]
 
@@ -65,9 +71,6 @@ class FileSearchExtension(Extension):
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
-
-        if query in cache:
-            return cache[query]
 
         out, err = process.communicate()
 
@@ -110,7 +113,6 @@ class FileSearchExtension(Extension):
 
             result.append({'path': f, 'name': f, 'icon': icon})
 
-        cache[query] = result
         return result
 
     def get_open_in_terminal_script(self, path):
