@@ -3,7 +3,7 @@
 [![Ulauncher Extension](https://img.shields.io/badge/Ulauncher-Extension-green.svg?style=for-the-badge)](https://ext.ulauncher.io/-/github-brpaz-ulauncher-file-search)
 [![GitHub license](https://img.shields.io/github/license/brpaz/file-search.svg?style=for-the-badge)](https://github.com/brpaz/ulauncher-file-search/blob/master/LICENSE)
 
-> Quick Search files and directories from [Ulauncher](https://ulauncher.io) using [https://github.com/sharkdp/fd](fd).
+> Quick Search files and directories from [Ulauncher](https://ulauncher.io) using [fd](https://github.com/sharkdp/fd).
 
 ## Demo
 
