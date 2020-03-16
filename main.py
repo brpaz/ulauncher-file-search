@@ -2,6 +2,7 @@
 
 import logging
 import os
+import platform
 import subprocess
 import mimetypes
 import gi
@@ -38,8 +39,14 @@ class FileSearchExtension(Extension):
 
     def search(self, query, file_type=None):
         """ Searches for Files using fd command """
+        fdcmd = 'fd'
+
+        distro = platform.dist()[0];
+        if distro == 'debian' or distro == 'Ubuntu':
+          fdcmd = 'fdfind'
+
         cmd = [
-            'timeout', '5s', 'ionice', '-c', '3', 'fd', '--threads', '1',
+            'timeout', '5s', 'ionice', '-c', '3', fdcmd, '--threads', '1',
             '--hidden'
         ]
 
