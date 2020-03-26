@@ -1,5 +1,6 @@
 """ Main Module """
 
+import functools
 import logging
 import os
 import subprocess
@@ -28,6 +29,18 @@ FILE_SEARCH_DIRECTORY = 'DIR'
 FILE_SEARCH_FILE = 'FILE'
 
 
+def memoize(func):
+    cache = func.cache = {}
+
+    @functools.wraps(func)
+    def memoized_func(*args, **kwargs):
+        key = str(args) + str(kwargs)
+        if key not in cache:
+            cache[key] = func(*args, **kwargs)
+        return cache[key]
+
+    return memoized_func
+
 class FileSearchExtension(Extension):
     """ Main Extension Class  """
 
@@ -36,10 +49,12 @@ class FileSearchExtension(Extension):
         super(FileSearchExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
 
+    @memoize
     def search(self, query, file_type=None):
         """ Searches for Files using fd command """
+
         cmd = [
-            'timeout', '5s', 'ionice', '-c', '3', 'fd', '--threads', '1',
+            'timeout', '5s', 'ionice', '-c', '3', 'fdfind', '--threads', '1',
             '--hidden'
         ]
 
