@@ -37,9 +37,16 @@ class FileSearchExtension(Extension):
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
 
     def search(self, query, file_type=None):
+        """ Try with the default fd or the previously successful command """
+        bin_name = 'fd'
+        try:
+            subprocess.check_call([bin_name])
+        except OSError:
+            bin_name = "fdfind" if bin_name == "fd" else "fd"
+
         """ Searches for Files using fd command """
         cmd = [
-            'timeout', '5s', 'ionice', '-c', '3', 'fd', '--threads', '1',
+            'timeout', '5s', 'ionice', '-c', '3', bin_name, '--threads', '1',
             '--hidden'
         ]
 
