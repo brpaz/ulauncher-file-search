@@ -57,8 +57,8 @@ class FileSearchExtension(Extension):
             cmd.append('-t')
             cmd.append('d')
 
-        cmd.append(query)
-        cmd.append(self.preferences['base_dir'])
+        cmd.append(query.replace(" ", ".+"))
+        cmd.extend(self.preferences['base_dir'].split(","))
 
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,
@@ -103,7 +103,8 @@ class FileSearchExtension(Extension):
                 else:
                     icon = "images/file.png"
 
-            result.append({'path': f, 'name': f, 'icon': icon})
+            result.append({'path': f, 'name': os.path.basename(f.decode()),
+                           'icon': icon, 'dir': os.path.dirname(f.decode())})
 
         return result
 
@@ -164,9 +165,10 @@ class KeywordQueryEventListener(EventListener):
         items = []
         for result in results[:15]:
             items.append(
-                ExtensionSmallResultItem(
+                ExtensionResultItem(
                     icon=result['icon'],
-                    name=result['path'].decode("utf-8"),
+                    name=result['name'],
+                    description=result['dir'],
                     on_enter=OpenAction(result['path'].decode("utf-8")),
                     on_alt_enter=extension.get_open_in_terminal_script(
                         result['path'].decode("utf-8"))))
