@@ -32,7 +32,7 @@
       "name": "Terminal Emulator",
       "description": "Sets the terminal emulator to open directories directly in the terminal",
       "default_value": "gnome-terminal",
-      "options": ["gnome-terminal", "tilix", "terminator", "xfce-terminal"]
+      "options": ["gnome-terminal", "tilix", "terminator", "xfce-terminal", "kitty"]
     },
     {
       "id": "base_dir",
