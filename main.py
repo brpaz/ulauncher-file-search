@@ -27,6 +27,14 @@ FILE_SEARCH_DIRECTORY = 'DIR'
 
 FILE_SEARCH_FILE = 'FILE'
 
+TERMINAL_PARAMS = {
+    'gnome-terminal': ['--working-directory'],
+    'terminator': ['--working-directory'],
+    'tilix': ['--working-directory'],
+    'xfce-terminal': ['--working-directory'],
+    'kitty': ['--directory']
+}
+
 
 class FileSearchExtension(Extension):
     """ Main Extension Class  """
@@ -112,11 +120,9 @@ class FileSearchExtension(Extension):
         terminal_emulator = self.preferences['terminal_emulator']
 
         # some terminals might work differently. This is already prepared for that.
-        if terminal_emulator in [
-                'gnome-terminal', 'terminator', 'tilix', 'xfce-terminal'
-        ]:
+        if terminal_emulator in TERMINAL_PARAMS:
             return RunScriptAction(f'{terminal_emulator} $@',
-                                   ' '.join(['--working-directory', path]))
+                                   ' '.join([*TERMINAL_PARAMS[terminal_emulator], path]))
 
         return DoNothingAction()
 
