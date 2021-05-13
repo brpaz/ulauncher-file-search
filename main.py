@@ -115,8 +115,8 @@ class FileSearchExtension(Extension):
         if terminal_emulator in [
                 'gnome-terminal', 'terminator', 'tilix', 'xfce-terminal'
         ]:
-            return RunScriptAction(terminal_emulator,
-                                   ['--working-directory', path])
+            return RunScriptAction(f'{terminal_emulator} $@',
+                                   ' '.join(['--working-directory', path]))
 
         return DoNothingAction()
 
