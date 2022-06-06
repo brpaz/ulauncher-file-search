@@ -1,5 +1,16 @@
 """ Main Module """
 
+from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
+from ulauncher.api.shared.action.DoNothingAction import DoNothingAction
+from ulauncher.api.shared.action.RunScriptAction import RunScriptAction
+from ulauncher.api.shared.action.OpenAction import OpenAction
+from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
+from ulauncher.api.shared.item.ExtensionSmallResultItem import ExtensionSmallResultItem
+from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
+from ulauncher.api.shared.event import KeywordQueryEvent
+from ulauncher.api.client.EventListener import EventListener
+from ulauncher.api.client.Extension import Extension
+from gi.repository import Gio, Gtk
 import logging
 import os
 import subprocess
@@ -7,17 +18,6 @@ import mimetypes
 import gi
 gi.require_version('Gtk', '3.0')
 # pylint: disable=import-error
-from gi.repository import Gio, Gtk
-from ulauncher.api.client.Extension import Extension
-from ulauncher.api.client.EventListener import EventListener
-from ulauncher.api.shared.event import KeywordQueryEvent
-from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
-from ulauncher.api.shared.item.ExtensionSmallResultItem import ExtensionSmallResultItem
-from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
-from ulauncher.api.shared.action.OpenAction import OpenAction
-from ulauncher.api.shared.action.RunScriptAction import RunScriptAction
-from ulauncher.api.shared.action.DoNothingAction import DoNothingAction
-from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
 
 LOGGING = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class FileSearchExtension(Extension):
         """ Searches for Files using fd command """
         cmd = [
             'timeout', '5s', 'ionice', '-c', '3', bin_name, '--threads', '1',
-            '--hidden'
+            '--hidden', "L"
         ]
 
         if file_type == FILE_SEARCH_FILE:
@@ -57,8 +57,8 @@ class FileSearchExtension(Extension):
             cmd.append('-t')
             cmd.append('d')
 
-        cmd.append(query)
-        cmd.append(self.preferences['base_dir'])
+        cmd.append(query.replace(" ", ".+"))
+        cmd.extend(self.preferences['base_dir'].split(","))
 
         process = subprocess.Popen(cmd,
                                    stdout=subprocess.PIPE,
@@ -74,7 +74,7 @@ class FileSearchExtension(Extension):
         files = list([_f for _f in files if _f])  # remove empty lines
 
         result = []
-        #get folder icon outside loop, so it only happens once
+        # get folder icon outside loop, so it only happens once
         file = Gio.File.new_for_path("/")
         folder_info = file.query_info('standard::icon', 0, Gio.Cancellable())
         folder_icon = folder_info.get_icon().get_names()[0]
@@ -103,7 +103,8 @@ class FileSearchExtension(Extension):
                 else:
                     icon = "images/file.png"
 
-            result.append({'path': f, 'name': f, 'icon': icon})
+            result.append({'path': f, 'name': os.path.basename(f.decode()),
+                           'icon': icon, 'dir': os.path.dirname(f.decode())})
 
         return result
 
@@ -164,9 +165,10 @@ class KeywordQueryEventListener(EventListener):
         items = []
         for result in results[:15]:
             items.append(
-                ExtensionSmallResultItem(
+                ExtensionResultItem(
                     icon=result['icon'],
-                    name=result['path'].decode("utf-8"),
+                    name=result['name'],
+                    description=result['dir'],
                     on_enter=OpenAction(result['path'].decode("utf-8")),
                     on_alt_enter=extension.get_open_in_terminal_script(
                         result['path'].decode("utf-8"))))
